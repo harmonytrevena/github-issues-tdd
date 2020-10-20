@@ -1,28 +1,33 @@
-import React, { useEffect, useState } from 'react';
-// import Issue from './Issue';
+import React, { Component } from "react";
+import { loadData } from "../utils/loadData";
+import Issue from "./issue";
 
-const IssuesList = props => {
-    const [issues, setIssues] = useState(null);
+class IssueList extends Component {
+  state = {
+    issues: []
+  };
 
-    async function fetchData(number) {
-        const response = await fetch("https://api.github.com/repos/facebook/create-react-app/issues/" + number);
-        setIssues(await response.json());
-    }
+  async componentDidMount() {
+    const issues = await loadData(
+      `https://api.github.com/repos/facebook/create-react-app/issues`
+    );
 
-    useEffect(() => {
-        fetchData(props.number);
-    }, [props.number]);
-
-  if (!issues) {
-    return "loading...";
+    this.setState({
+      issues
+    });
   }
 
-  return (
-    <details>
-      <summary>{issues.title}</summary>
-      <summary>{issues.body}</summary>
-    </details>
-  );
+  render() {
+    const { issues } = this.state;
+
+    return (
+      <ul>
+        {issues.map(issue => (
+          <Issue key={issue.id} issue={issue} />
+        ))}
+      </ul>
+    );
+  }
 }
-  
-export default IssuesList;
+
+export default IssueList;
